@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Navbar } from '@/components/navbar'
 import { Footer } from '@/components/footer'
@@ -13,9 +13,14 @@ const PRODUCTS_PER_PAGE = 8
 export default function CategoryPage() {
   const searchParams = useSearchParams()
   const categoryParam = searchParams.get('cat')
-  
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(categoryParam)
+
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [visibleCount, setVisibleCount] = useState(PRODUCTS_PER_PAGE)
+
+  // 🔥 مهم: نضبط القيمة بعد التحميل
+  useEffect(() => {
+    setSelectedCategory(categoryParam)
+  }, [categoryParam])
 
   const filteredProducts = useMemo(() => {
     if (!selectedCategory) return products
@@ -37,17 +42,21 @@ export default function CategoryPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
+
       <main className="flex-1 py-8">
         <div className="container mx-auto px-4">
-          {/* Page Header */}
+
+          {/* Header */}
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-foreground mb-4">المنيو</h1>
+            <h1 className="text-4xl font-bold text-foreground mb-4">
+              المنيو
+            </h1>
             <p className="text-muted-foreground text-lg">
               اكتشف تشكيلتنا الواسعة من الحلويات والمشروبات
             </p>
           </div>
 
-          {/* Category Filters */}
+          {/* Filters */}
           <div className="flex flex-wrap justify-center gap-3 mb-8">
             <Button
               variant={selectedCategory === null ? 'default' : 'outline'}
@@ -56,6 +65,7 @@ export default function CategoryPage() {
             >
               الكل
             </Button>
+
             {categories.map(cat => (
               <Button
                 key={cat.id}
@@ -68,21 +78,23 @@ export default function CategoryPage() {
             ))}
           </div>
 
-          {/* Products Grid */}
+          {/* Products */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
             {visibleProducts.map(product => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
 
-          {/* Empty State */}
+          {/* Empty state */}
           {filteredProducts.length === 0 && (
             <div className="text-center py-16">
-              <p className="text-muted-foreground text-lg">لا توجد منتجات في هذا القسم</p>
+              <p className="text-muted-foreground text-lg">
+                لا توجد منتجات في هذا القسم
+              </p>
             </div>
           )}
 
-          {/* Show More Button */}
+          {/* Show more */}
           {hasMore && (
             <div className="text-center mt-12">
               <Button
@@ -95,8 +107,10 @@ export default function CategoryPage() {
               </Button>
             </div>
           )}
+
         </div>
       </main>
+
       <Footer />
     </div>
   )
