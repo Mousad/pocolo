@@ -12,16 +12,17 @@ const PRODUCTS_PER_PAGE = 8
 
 export default function CategoryPage() {
   const searchParams = useSearchParams()
-  const categoryParam = searchParams.get('cat')
 
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [visibleCount, setVisibleCount] = useState(PRODUCTS_PER_PAGE)
 
-  // 🔥 مهم: نضبط القيمة بعد التحميل
+  // 🔥 جلب الكاتيجوري من الرابط بعد التحميل (حل prerender error)
   useEffect(() => {
-    setSelectedCategory(categoryParam)
-  }, [categoryParam])
+    const cat = searchParams.get('cat')
+    setSelectedCategory(cat)
+  }, [searchParams])
 
+  // 🔥 فلترة المنتجات
   const filteredProducts = useMemo(() => {
     if (!selectedCategory) return products
     return products.filter(p => p.category === selectedCategory)
@@ -56,7 +57,7 @@ export default function CategoryPage() {
             </p>
           </div>
 
-          {/* Filters */}
+          {/* Categories */}
           <div className="flex flex-wrap justify-center gap-3 mb-8">
             <Button
               variant={selectedCategory === null ? 'default' : 'outline'}
@@ -85,7 +86,7 @@ export default function CategoryPage() {
             ))}
           </div>
 
-          {/* Empty state */}
+          {/* Empty State */}
           {filteredProducts.length === 0 && (
             <div className="text-center py-16">
               <p className="text-muted-foreground text-lg">
@@ -94,7 +95,7 @@ export default function CategoryPage() {
             </div>
           )}
 
-          {/* Show more */}
+          {/* Load More */}
           {hasMore && (
             <div className="text-center mt-12">
               <Button
